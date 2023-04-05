@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import "./AddEdit.css";
 import { toast } from "react-toastify";
+import { addContact, updateContact, getContact } from "../redux/feature/contactSlice";
 
 const initialState = {
   name: "",
@@ -15,13 +17,34 @@ const AddEdit = () => {
 
   const { name, email, phone, status } = state;
 
+  // toujours mettre le meme nom entre const {contact} et (state) => state.contact !!
+  const {contact} = useSelector((state) => state.contact)
+  console.log("contacts AddEdit", contact)
+
+  const navigate = useHistory();
+  const dispatch = useDispatch();
+  const {id} = useParams()
+
+  useEffect(() => {  
+    dispatch(getContact(id));
+    setState({...contact})
+  }, [id, contact])
+  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name || !email || !phone || !status) {
       toast.error("Please provide value into each input field");
     } else {
-      
-    }
+        if (!id){
+          dispatch(addContact(state));
+          toast.success("Contact added successfuly");
+        } else {
+          dispatch(updateContact(state));
+          toast.success("Contact updated successfuly");
+      }
+      navigate.push("/");
+  }
   };
 
   const handleInputChange = (e) => {
@@ -89,7 +112,7 @@ const AddEdit = () => {
           value={phone || ""}
           onChange={handleInputChange}
         />
-        <input type="submit" value="Save" />
+        <input type="submit" value={id ? "Update" : "Save"} />
         <Link to="/">
           <input type="button" value="Go Back" />
         </Link>

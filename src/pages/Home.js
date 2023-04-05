@@ -1,8 +1,11 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import "./Home.css";
+import { deleteContact, filterContact } from "../redux/feature/contactSlice";
 
-const contactData = [
+export const contactData = [
   {
     id: 1,
     name: "Mayank Kumar",
@@ -34,14 +37,19 @@ const contactData = [
 ];
 
 const Home = () => {
+
+  const {contacts, filter} = useSelector((state) => state.contact)
+  console.log("contacts home", contacts)
+
+  const dispatch = useDispatch()
   const onDeleteContact = (id) => {
     if (
       window.confirm("Are you sure that you wanted to delete that contact ?")
     ) {
+      dispatch(deleteContact(id))
+      toast.success("Contact deleted successfuly");
     }
   };
-
-  const filterData = (value) => {};
 
   return (
     <div style={{ marginTop: "150px" }}>
@@ -61,7 +69,13 @@ const Home = () => {
           </tr>
         </thead>
         <tbody>
-          {contactData.map((item, index) => {
+          {contacts && contacts.filter((item) => {
+            if(filter === "All"){
+              return contacts;
+            } else {
+              return item.status === filter;
+            }
+          }).map((item, index) => {
             return (
               <tr key={item.id}>
                 <th scope="row">{index + 1}</th>
@@ -88,6 +102,9 @@ const Home = () => {
           })}
         </tbody>
       </table>
+      <button className="btn btn-active" onClick={() => dispatch(filterContact("Active"))}> Active </button>
+      <button className="btn btn-inactive" onClick={() => dispatch(filterContact("Inactive"))}> Inactive </button>
+      <button className="btn btn-reset" onClick={() => dispatch(filterContact("All"))}> All </button>
     </div>
   );
 };

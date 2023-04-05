@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import "./View.css";
+import { useDispatch, useSelector } from "react-redux";
+import { getContact } from "../redux/feature/contactSlice";
 
 const View = () => {
-  const [user, setUser] = useState({});
 
-  const { id } = useParams();
+  const {contact} = useSelector((state) => state.contact)
+  console.log("contact", contact)
+  const dispatch = useDispatch();
+  const {id} = useParams()
+
+  useEffect(() => {  
+    dispatch(getContact(id))
+  }, [id])
 
   return (
     <div style={{ marginTop: "150px" }}>
@@ -19,19 +27,19 @@ const View = () => {
           <br />
           <br />
           <strong>Name: </strong>
-          <span>{user.name}</span>
+          <span>{contact.name}</span>
           <br />
           <br />
           <strong>Email: </strong>
-          <span>{user.email}</span>
+          <span>{contact.email}</span>
           <br />
           <br />
           <strong>Status: </strong>
-          <span>{user.status}</span>
+          <span>{contact.status}</span>
           <br />
           <br />
           <strong>Phone: </strong>
-          <span>{user.phone}</span>
+          <span>{contact.phone}</span>
           <br />
           <br />
           <Link to="/">
